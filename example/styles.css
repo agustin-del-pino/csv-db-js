@@ -1,0 +1,41 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    color-scheme: light dark;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100%;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#jobs {
+    padding: 10px;
+}
+
+#jobs span {
+    padding: 10px;
+}
+
+#employees {
+    padding: 10px;
+}
+
+#employees .employee {
+    padding: 10px;
+}
+
+#employees .employee span {
+    padding: 10px;
+}
+
+.employee .see-job {
+    cursor: pointer;
+    text-decoration: underline;
+}

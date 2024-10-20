@@ -26,7 +26,6 @@ class CSVTable {
 
         for (let i = 0, s = 0, c = 0; ;) {
             if (csv[i] === "\x00") {
-                console.log( csv.substring(s, i))
                 this.#records.at(-1)[this.#headers[c]] = csv.substring(s, i)
                 break;
             }
@@ -72,20 +71,20 @@ class CSVTable {
     get count() {
         return this.#records.length;
     }
+    get first() {
+        return this.index(0);
+    }
+    get last() {
+        return this.index(-1);
+    }
+    get all() {
+        return this.#records;
+    }
     index(n) {
         return this.#records.at(n)
     }
-    first() {
-        return this.index(0);
-    }
-    last() {
-        return this.index(-1);
-    }
     slice(start, end) {
         return this.#records.slice(start, end)
-    }
-    all() {
-        return this.#records;
     }
     match(m) {
         const keys = Object.keys(m);
@@ -112,15 +111,24 @@ class CSVTable {
     matchBy(m) {
         return this.#records.filter(m);
     }
-    relate(table, ref) {
-        this.#relations[ref] = table;
+    relate(table, key) {
+        console.log(table, key);
+        this.#relations[key] = table;
     }
-    relation(ref, rec) {
-        return this.#relations[ref].match({"id":rec[ref]});
+    relation(key, rec) {
+        return this.#relations[key].match({"id":rec[key]});
     }
-    relationAll(ref, recs) {
-        const rel = recs.map(r=>r[ref]);
-        return this.#relations[ref].matchBy(r=>rel.includes(r["id"]));
+    relationAll(key, recs) {
+        const rel = recs.map(r=>r[key]);
+        return this.#relations[key].matchBy(r=>rel.includes(r["id"]));
+    }
+    /**
+     * 
+     * @param {string} key 
+     * @returns {CSVTable}
+     */
+    relatedTable(key) {
+        return this.#relations[key];
     }
 }
 
@@ -164,6 +172,7 @@ class CSVClient {
     }
 
     async retrieve(tableName) {
+        console.log(tableName)
         const res = await fetch(`${this.url}/${tableName}.csv`);
         switch (res.status) {
             case 404:
@@ -187,6 +196,6 @@ class CSVClient {
         if (relation === undefined) {
             throw new CSVNoRelationError(`the ${table.name} is not related to anything`)
         }
-        table.relate(this.retrieve(relation["related"]));
+        table.relate(await this.retrieve(relation["related"]), key);
     }
 }

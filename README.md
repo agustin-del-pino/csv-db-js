@@ -11,7 +11,7 @@ Add this CDN to use this lib.
 Allows to obtain the CSV file from a server.
 
 The constructor of this class takes: 
-`url` (the base url from where the csv files are retrived), `separator` (for example, `,`), `delimiter` (for example `\n`).
+`url` (the base url from where the csv files are retrieved), `separator` (for example, `,`), `delimiter` (for example `\n`).
 
 The separator represents the column separation and the delimiter represents the row delimitation.
 
@@ -21,7 +21,7 @@ id, name; 1, Monika
 
 In the previous example, the separator is a `,` and the delimiter is a `;`.
 
-## Readonly
+## Properties
 
 - `url`, the given url at constructor.
 - `sep`, the given separator at constructor.
@@ -42,41 +42,50 @@ Performs ping. In case `loadRelations` option is `true`, retrieves the relations
 ### `retrieve(tableName)`
 Retrieves a csv file that match with the `tableName`.
 
-### `relate(table, ref)`
-Relates a table to its related table by the `ref` *(reference)*.
+### `relate(table, key)`
+Relates a table to its related table by the `key` *(foreign key)*.
 
 
 # CSV Table
 The javascript representation of an CSV Table.
 
 The constructor of this class takes:
-The `name` of the table, the `csv` plain-text content, the `sep` (separator), the `dlm` (delimeter).
+The `name` of the table, the `csv` plain-text content, the `sep` (separator), the `dlm` (delimiter).
 
-## Readonly
+## Properties
 
 - `name` is table's name.
 - `count` is the number of record within the table
 - `headers` is table's array headers.
+- `first` is the first record of the table.
+- `last` is the last record of the table.
+- `all` is record's array
 
 ## API
 
+### `index(n)`
+Retrieves a record by its specific index. A negative index will count back from the last record.
+
+### `slice(start, end)`
+Retrieves a portion of record's array, where `start` is included but `end` isn't.
+
 ### `match(m)`
-Retrives the first record that matches with `m` (which is an object).
+Retrieves the first record that matches with `m` (which is an object).
 
 ### `matchAll(m)`
-Retrives all records that match with `m` (which is an object).
+Retrieves all records that match with `m` (which is an object).
 
 ### `matchBy(m)`
-Retrives all records that match by the predicator `m` (which is a function).
+Retrieves all records that match by the predicator `m` (which is a function).
 
-### `relate(ref, table)`
-Releates a CSV table to the current one by a reference.
+### `relate(key, table)`
+Relates a CSV table to the current one by a key *(it's recommend to use the same name as the foreign key)*.
 
-### `relation(ref, rec)` 
-Returns the record related to `rec` (which is a record) from the related table by the `ref`.
+### `relation(key, rec)` 
+Returns the record related to `rec` (which is a record) from the related table by the `key`.
 
-### `relationAll(ref, rec)`
-Returns all records related to `recs` (which is an array of recrords) from the related table by the `ref`.
+### `relationAll(key, rec)`
+Returns all records related to `recs` (which is an array of record) from the related table by the `key`.
 
 # CSV Files at Server Side
 
@@ -151,8 +160,8 @@ const conn = new CSVClient("http://url.com/db", ",", "\n");
 
 await conn.connect({loadRelations:true});
 
-const tableA = conn.retrieve("tableA");
-conn.relate(tableA, "job");
+const tableA = await conn.retrieve("tableA");
+await conn.relate(tableA, "job");
 
 const diana = tableA.match({"name":"Diana"});
 const dianaJob = tableA.relation("job", diana);
