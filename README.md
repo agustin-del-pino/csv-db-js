@@ -5,6 +5,7 @@ Use CSV files as relation DB in JS.
 
 Add this CDN to use this lib.
 ```
+https://cdn.statically.io/gh/agustin-del-pino/csv-db-js@main/csv-db.js
 ```
 
 # CSV Client 
