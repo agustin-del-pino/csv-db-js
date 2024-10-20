@@ -1,4 +1,4 @@
-id,name,job
-0,Alicia,0
-1,Diana,1
-2,Maria,4
+id,name,email,job
+0,Alicia,alc@baya.com,0
+1,Diana,din@baya.com,1
+2,Maria,mra@baya.com,4
