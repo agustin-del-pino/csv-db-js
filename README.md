@@ -77,3 +77,93 @@ Returns the record related to `rec` (which is a record) from the related table b
 
 ### `relationAll(ref, rec)`
 Returns all records related to `recs` (which is an array of recrords) from the related table by the `ref`.
+
+# CSV Files at Server Side
+
+The csv files are the tables of the *"db"*. So, their filenames are table's name. As mandatory requirement, those must have
+the `id` column of any type.
+
+**Server Side**
+```
+db/
+  - my_table.csv
+  - .ping
+css/
+  - styles.css
+js/
+  - main.js
+index.html
+```
+
+The `.ping` file is used by the `CSVClient` for ping-ing.
+
+The `my_table.csv` must have at least this schema.
+
+````csv
+id: any, ...
+````
+> See more in the examples.
+
+# Relations
+
+The relation between tables works similar as *relation-database*. There is one (or more) column that works as foreign key. Also, the file `__relation.csv` must exists at server side. This file resolves the relations between tables.
+
+**Relation CSV Schema**
+````
+name: table's name
+key: relation column
+related: related table's name
+````
+
+For example:
+
+*Let `tableA` and `tableB`. The first one is related to the latter one by the column `job`*
+
+**Table A**
+````csv
+id,name,job
+0,Alicia,0
+1,Diana,1
+2,Maria,4
+````
+
+**Table B**
+````csv
+id,name
+0,Programmer
+1,Engineer
+2,Cosmonaut
+3,Doctor
+4,Lawyer
+````
+
+*Let `tableA -> tableB` in `__relation.csv`*
+
+```csv
+name,key,related
+tableA,job,tableB
+```
+
+Using `CSVClient` it will be like this:
+
+````js
+const conn = new CSVClient("http://url.com/db", ",", "\n");
+
+await conn.connect({loadRelations:true});
+
+const tableA = conn.retrieve("tableA");
+conn.relate(tableA, "job");
+
+const diana = tableA.match({"name":"Diana"});
+const dianaJob = tableA.relation("job", diana);
+
+console.log(diana);
+console.log(dianaJob);
+````
+
+*Output*
+
+````json
+{"id": 1, "name": "Diana", "job": 1}
+{"id": 1, "name": "Engineer"}
+````

@@ -67,10 +67,25 @@ class CSVTable {
         return this.#name;
     }
     get headers() {
-        return [...this.#headers];
+        return this.#headers;
     }
     get count() {
         return this.#records.length;
+    }
+    index(n) {
+        return this.#records.at(n)
+    }
+    first() {
+        return this.index(0);
+    }
+    last() {
+        return this.index(-1);
+    }
+    slice(start, end) {
+        return this.#records.slice(start, end)
+    }
+    all() {
+        return this.#records;
     }
     match(m) {
         const keys = Object.keys(m);
@@ -154,7 +169,7 @@ class CSVClient {
             case 404:
                 throw new CSVNotFoundError(tableName);
             case 200:
-                return new CSVtableName(talbe, await res.text(), this.#config.separator, this.#config.delimiter);
+                return new CSVTable(tableName, await res.text(), this.#config.separator, this.#config.delimiter);
             default:
                 throw new CSVUnexpectedError(`the csv '${tableName}' could not be retrieve: http status ${res.status}`)
         }
@@ -162,20 +177,16 @@ class CSVClient {
     /**
      * 
      * @param {CSVTable} table 
-     * @param {string} ref
+     * @param {string} key
      */
-    async relate(table, ref) {
+    async relate(table, key) {
         if (this.#relations === null) {
-            this.loadRelations();
+           await this.loadRelations();
         }
-        const relation = this.#relations.match({ "name": table.name })
+        const relation = this.#relations.match({ "name": table.name, key })
         if (relation === undefined) {
             throw new CSVNoRelationError(`the ${table.name} is not related to anything`)
         }
-        const rel = relation[ref]
-        if (rel === undefined) {
-            throw new CSVNoRelationError(`the ${table.name} has not '${ref}' relation`)
-        }
-        table.relate(this.retrieve(rel));
+        table.relate(this.retrieve(relation["related"]));
     }
 }

@@ -1,6 +1,12 @@
-const tableA = new CSVTable("users", "id,name,email,job;1,Juan,jn@gmail.com,2;2,Juan,juan@gmail.com,1", ",", ";");
-const tableB = new CSVTable("jobs", "id,name;1,Teacher;2,Programmer", ",", ";");
+const conn = new CSVClient("http://url.com/db", ",", "\n");
 
-tableA.relate(tableB, "job")
+await conn.connect({loadRelations:true});
 
-console.log(tableA.relationAll("job", tableA.matchAll({ "name": "Juan" })))
+const tableA = conn.retrieve("tableA");
+conn.relate(tableA, "job");
+
+const diana = tableA.match({"name":"Diana"});
+const dianaJob = tableA.relation("job", diana);
+
+console.log(diana);
+console.log(dianaJob);
